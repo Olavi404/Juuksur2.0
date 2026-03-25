@@ -93,7 +93,10 @@ Render setup:
 2. In Render, choose `New +` -> `Blueprint` and connect this GitHub repository.
 3. Render will create a web service and PostgreSQL database.
 4. Set `APP_URL` to the Render service URL.
-5. Deploy and check logs for successful build, migration, and seed.
+5. Deploy and check logs for successful build.
+6. On free tier, run migrations and seed manually in Render Shell:
+	- `php artisan migrate --force`
+	- `php artisan db:seed --force`
 
 Production recommendations:
 - Use secure secrets and never commit production credentials.
