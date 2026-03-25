@@ -24,7 +24,8 @@ COPY . .
 # Install PHP/JS dependencies and build frontend assets
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader \
     && npm install \
-    && npm run build
+    && npm run build \
+    && chmod +x /opt/render/project/src/docker-start.sh
 
-# On free tier we run migrate+seed at boot to avoid unsupported preDeployCommand
-CMD sh -c "php artisan migrate --force && php artisan db:seed --force && php artisan serve --host 0.0.0.0 --port ${PORT:-10000}"
+# On free tier we run migrate+seed at boot with retry logic.
+CMD ["/opt/render/project/src/docker-start.sh"]
