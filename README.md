@@ -85,9 +85,20 @@ Included feature tests:
 5. Guest is redirected from admin page
 6. Authenticated admin can access bookings list
 
-## Deployment Notes
-- Use production `.env` and secure secrets.
-- Set `APP_ENV=production`, `APP_DEBUG=false`.
-- Run `php artisan config:cache`, `php artisan route:cache`, `php artisan view:cache`.
-- Run `npm run build` and ensure `public/build` is deployed.
+## Deployment Notes (Render)
+This repository should be deployed to Render as a full Laravel app. Before deploying, ensure the repository root includes Laravel core files such as `artisan`, `composer.json`, and `package.json`.
+
+Render setup:
+1. Use the included `render.yaml` blueprint.
+2. In Render, choose `New +` -> `Blueprint` and connect this GitHub repository.
+3. Render will create a web service and PostgreSQL database.
+4. Set `APP_URL` to the Render service URL.
+5. Deploy and check logs for successful build, migration, and seed.
+
+Production recommendations:
+- Use secure secrets and never commit production credentials.
+- Keep `APP_ENV=production` and `APP_DEBUG=false`.
+- Cache config/routes/views in production.
 - Ensure PostgreSQL user has migration and index permissions.
+
+Detailed steps are in `RENDER_DEPLOY.md`.
