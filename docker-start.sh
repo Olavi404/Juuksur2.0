@@ -1,6 +1,15 @@
 #!/usr/bin/env sh
 set -eu
 
+# Ensure APP_KEY is in Laravel-supported base64 format with valid length.
+if ! php -r '$k=getenv("APP_KEY"); if(!is_string($k)||!str_starts_with($k,"base64:")) exit(1); $d=base64_decode(substr($k,7), true); if($d===false) exit(1); $l=strlen($d); exit(($l===16||$l===32)?0:1);'; then
+  export APP_KEY="$(php artisan key:generate --show --no-interaction)"
+  echo "Generated runtime APP_KEY because configured key was missing or invalid." >&2
+fi
+
+# Clear potentially stale cached configuration from previous image versions.
+php artisan config:clear || true
+
 # Wait for database and apply schema before serving traffic.
 MAX_RETRIES=30
 RETRY_DELAY=3
