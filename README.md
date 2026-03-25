@@ -1,4 +1,4 @@
-# Hair Salon Booking MVP (Laravel 12)
+# Hair Salon Booking MVP (Laravel 12).
 
 ## Project Overview
 This is a minimal but production-minded hair salon booking system built with Laravel 12, PHP 8.3, PostgreSQL, Blade templates, and Bootstrap 5.
