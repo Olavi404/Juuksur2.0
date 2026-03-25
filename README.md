@@ -102,3 +102,5 @@ Production recommendations:
 - Ensure PostgreSQL user has migration and index permissions.
 
 Detailed steps are in `RENDER_DEPLOY.md`.
+
+If you need a copy-paste Windows flow to complete the full Laravel skeleton and redeploy immediately, use `DEPLOY_NEXT_STEPS.md`.
