@@ -91,12 +91,14 @@ This repository should be deployed to Render as a full Laravel app. Before deplo
 Render setup:
 1. Use the included `render.yaml` blueprint.
 2. In Render, choose `New +` -> `Blueprint` and connect this GitHub repository.
-3. Render will create a web service and PostgreSQL database.
+3. Render will create a Docker web service and PostgreSQL database.
 4. Set `APP_URL` to the Render service URL.
-5. Deploy and check logs for successful build.
-6. On free tier, run migrations and seed manually in Render Shell:
-	- `php artisan migrate --force`
-	- `php artisan db:seed --force`
+5. Deploy and check logs for successful Docker build and startup.
+
+The Docker startup command runs:
+- `php artisan migrate --force`
+- `php artisan db:seed --force`
+- `php artisan serve --host 0.0.0.0 --port $PORT`
 
 Production recommendations:
 - Use secure secrets and never commit production credentials.
