@@ -23,11 +23,8 @@ COPY . .
 
 # Install PHP/JS dependencies and build frontend assets
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader \
-    && npm ci \
-    && npm run build \
-    && php artisan config:cache \
-    && php artisan route:cache \
-    && php artisan view:cache
+    && npm install \
+    && npm run build
 
 # On free tier we run migrate+seed at boot to avoid unsupported preDeployCommand
 CMD sh -c "php artisan migrate --force && php artisan db:seed --force && php artisan serve --host 0.0.0.0 --port ${PORT:-10000}"
