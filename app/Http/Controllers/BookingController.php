@@ -12,6 +12,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class BookingController extends Controller
@@ -31,13 +32,31 @@ class BookingController extends Controller
 
     public function availableTimes(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'hairdresser_id' => ['required', 'integer', 'exists:hairdressers,id'],
-            'booking_date' => ['required', 'date'],
-        ]);
+        try {
+            $validated = $request->validate([
+                'hairdresser_id' => ['required', 'integer'],
+                'booking_date' => ['required', 'date'],
+            ]);
+        } catch (ValidationException $exception) {
+            return response()->json([
+                'message' => 'Invalid hairdresser or booking date.',
+                'errors' => $exception->errors(),
+            ], 422);
+        }
+
+        $hairdresser = Hairdresser::query()->find((int) $validated['hairdresser_id']);
+
+        if ($hairdresser === null) {
+            return response()->json([
+                'message' => 'Selected hairdresser was not found.',
+                'errors' => [
+                    'hairdresser_id' => ['Selected hairdresser was not found.'],
+                ],
+            ], 422);
+        }
 
         $slots = $this->availabilityService->availableSlots(
-            (int) $validated['hairdresser_id'],
+            $hairdresser->id,
             (string) $validated['booking_date'],
         );
 

@@ -8,7 +8,7 @@
                 <h1 class="h4 mb-0">Book an Appointment</h1>
             </div>
             <div class="card-body">
-                <form method="POST" action="{{ route('bookings.store') }}" id="bookingForm">
+                <form method="POST" action="/bookings" id="bookingForm">
                     @csrf
 
                     <div class="row g-3">
@@ -76,10 +76,15 @@
     const hairdresserSelect = document.getElementById('hairdresser_id');
     const dateInput = document.getElementById('booking_date');
     const slotSelect = document.getElementById('start_time');
+    const slotHelpText = document.createElement('small');
+    slotHelpText.className = 'text-danger d-block mt-1';
+    slotSelect.insertAdjacentElement('afterend', slotHelpText);
 
     async function refreshAvailableTimes() {
         const hairdresserId = hairdresserSelect.value;
         const bookingDate = dateInput.value;
+
+        slotHelpText.textContent = '';
 
         if (!hairdresserId || !bookingDate) {
             slotSelect.innerHTML = '<option value="">Select hairdresser and date first</option>';
@@ -93,13 +98,37 @@
             booking_date: bookingDate,
         });
 
+        console.log('Fetching available times:', { hairdresserId, bookingDate, url: `/available-times?${params.toString()}` });
+
         try {
-            const response = await fetch(`{{ route('bookings.available-times') }}?${params.toString()}`, {
+            const response = await fetch(`/available-times?${params.toString()}`, {
                 headers: {
                     'Accept': 'application/json'
                 }
             });
+
+            console.log('Response status:', response.status, response.ok);
+
+            if (!response.ok) {
+                let message = 'No available times for selected date';
+
+                try {
+                    const errorData = await response.json();
+                    console.log('Error JSON:', errorData);
+                    if (typeof errorData?.message === 'string' && errorData.message.length > 0) {
+                        message = errorData.message;
+                    }
+                } catch (error) {
+                    // Ignore parsing error and keep fallback message.
+                }
+
+                slotSelect.innerHTML = '<option value="">No available times for selected date</option>';
+                slotHelpText.textContent = `Failed to load times (HTTP ${response.status}): ${message}`;
+                return;
+            }
+
             const data = await response.json();
+            console.log('Success JSON:', data);
             const slots = data.slots ?? [];
 
             if (slots.length === 0) {
@@ -123,6 +152,8 @@
             }
         } catch (error) {
             slotSelect.innerHTML = '<option value="">Failed to load times</option>';
+            console.error('Fetch error:', error);
+            slotHelpText.textContent = `Network error while loading times: ${error?.message ?? 'Unknown error'}`;
         }
     }
 
